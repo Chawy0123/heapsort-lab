@@ -444,6 +444,78 @@ a:focus-visible {
   margin-block: 4px 8px;
 }
 
+.tree-edge {
+  stroke: #54748f;
+  stroke-width: 1.5;
+  transition: stroke 220ms ease, stroke-width 220ms ease, opacity 220ms ease;
+}
+
+.tree-edge.is-compare {
+  stroke: var(--amber);
+  stroke-width: 2.5;
+}
+
+.tree-edge.is-swap {
+  stroke: var(--coral);
+  stroke-width: 2.7;
+}
+
+.tree-edge.is-sorted {
+  stroke: var(--green);
+  stroke-dasharray: 5 5;
+  opacity: 0.6;
+}
+
+.tree-node circle {
+  fill: #0c2436;
+  stroke: var(--cyan);
+  stroke-width: 2;
+  transition: fill 220ms ease, stroke 220ms ease, stroke-width 220ms ease,
+    filter 220ms ease;
+}
+
+.tree-node .node-value {
+  fill: var(--text);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.tree-node .node-index {
+  fill: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.tree-node.is-compare circle {
+  fill: #3b2c13;
+  stroke: var(--amber);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 8px rgba(255, 196, 81, 0.28));
+}
+
+.tree-node.is-swap circle {
+  fill: #3a2026;
+  stroke: var(--coral);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 8px rgba(255, 133, 133, 0.26));
+}
+
+.tree-node.is-sorted circle {
+  fill: #173525;
+  stroke: var(--green);
+  stroke-width: 2;
+}
+
+.tree-node.is-sorted .node-value {
+  fill: #dfffe4;
+}
+
+.button.is-playing {
+  border-color: var(--coral);
+  color: var(--coral);
+}
+
 .legend {
   display: flex;
   flex-wrap: wrap;
