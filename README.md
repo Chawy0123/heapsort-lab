@@ -4,7 +4,7 @@
 
 ## 線上作品
 
-GitHub Pages 網址：部署完成後補上。
+GitHub Pages 網址：<https://chawy0123.github.io/heapsort-lab/>
 
 ## 主要功能
 
