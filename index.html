@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Heap Sort 堆積排序互動實驗室：建立最大堆積、逐步取出最大值，並比較 Heap Sort 與 Bubble Sort 的時間複雜度。"
+    />
+    <title>Heap Sort Lab｜堆積排序實驗室</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="src/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#visualizer">跳到互動展示</a>
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a class="brand" href="#top" aria-label="回到頁首">Heap Sort Lab</a>
+        <nav aria-label="主要導覽">
+          <a href="#visualizer">互動展示</a>
+          <a href="#principle">排序原理</a>
+          <a href="#complexity">複雜度比較</a>
+          <a href="#reflection">學習心得</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero container" aria-labelledby="page-title">
+        <h1 id="page-title">Heap Sort Lab｜堆積排序實驗室</h1>
+        <p>建立最大堆積，逐步取出最大值，看見排序真正發生的過程。</p>
+        <a class="button button-primary hero-action" href="#visualizer">
+          開始排序
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </a>
+      </section>
+
+      <section class="section visualizer-section" id="visualizer" aria-labelledby="visualizer-title">
+        <div class="container">
+          <div class="section-heading">
+            <span class="section-marker" aria-hidden="true"></span>
+            <div>
+              <h2 id="visualizer-title">互動展示</h2>
+              <p>輸入一組整數，觀察陣列如何先建成 Max-Heap，再一輪一輪把最大值放到最右側。</p>
+            </div>
+          </div>
+
+          <div class="lab-panel">
+            <form class="data-toolbar" id="data-form" novalidate>
+              <label for="data-input">輸入整數<span>（逗號或空白分隔）</span></label>
+              <input
+                id="data-input"
+                name="data"
+                type="text"
+                value="4, 10, 3, 5, 1"
+                inputmode="text"
+                autocomplete="off"
+                aria-describedby="input-help input-error"
+              />
+              <button class="button button-primary" id="apply-data" type="submit">套用資料</button>
+              <button class="button button-secondary" id="random-data" type="button">隨機資料</button>
+              <button class="button button-ghost" id="reset-sort" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 4v6h6M20 20v-6h-6M5.1 15a8 8 0 0 0 13.1 2M18.9 9A8 8 0 0 0 5.8 7" />
+                </svg>
+                重設
+              </button>
+              <p class="input-help" id="input-help">可輸入 2–12 個整數，支援負數與重複值。</p>
+              <p class="input-error" id="input-error" role="alert" aria-live="polite"></p>
+            </form>
+
+            <div class="playback-toolbar" aria-label="排序播放控制">
+              <button class="button button-primary" id="build-heap" type="button">建立最大堆積</button>
+              <button class="button button-secondary" id="prev-step" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+                上一步
+              </button>
+              <button class="button button-secondary is-accent" id="next-step" type="button">
+                下一步
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+              </button>
+              <button class="button button-secondary" id="auto-play" type="button" aria-pressed="false">
+                <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="m8 5 11 7-11 7Z" /></svg>
+                <span>自動排序</span>
+              </button>
+              <div class="progress-wrap" aria-label="排序進度">
+                <span id="current-phase">尚未開始</span>
+                <div class="progress-track"><span id="progress-bar"></span></div>
+                <span id="step-counter">0 / 0</span>
+              </div>
+            </div>
+
+            <div class="lab-grid">
+              <div class="visual-stage">
+                <div class="stage-heading">
+                  <h3>最大堆積視圖</h3>
+                  <span class="heap-status" id="heap-status">等待建堆</span>
+                </div>
+                <svg
+                  id="heap-tree"
+                  class="heap-tree"
+                  viewBox="0 0 680 330"
+                  role="img"
+                  aria-label="最大堆積二元樹"
+                ></svg>
+
+                <div class="array-heading">
+                  <h3>陣列 <span>heap｜sorted</span></h3>
+                  <div class="legend" aria-label="狀態圖例">
+                    <span><i class="legend-heap"></i>堆積區</span>
+                    <span><i class="legend-compare"></i>目前比較</span>
+                    <span><i class="legend-swap"></i>正在交換</span>
+                    <span><i class="legend-sorted"></i>已排序</span>
+                  </div>
+                </div>
+                <div id="array-view" class="array-view" aria-live="polite"></div>
+              </div>
+
+              <aside class="step-panel" aria-label="目前排序狀態">
+                <div class="step-copy">
+                  <p class="panel-label">目前步驟說明</p>
+                  <p id="step-message" aria-live="polite">套用資料後，按「建立最大堆積」開始。</p>
+                </div>
+
+                <div class="extracted-block">
+                  <p class="panel-label">最大值取出紀錄</p>
+                  <p id="extracted-values" class="extracted-values" aria-live="polite">尚未取出</p>
+                </div>
+
+                <dl class="stats-grid">
+                  <div><dt>比較次數</dt><dd id="comparison-count">0</dd></div>
+                  <div><dt>交換次數</dt><dd id="swap-count">0</dd></div>
+                  <div><dt>堆積大小</dt><dd id="heap-size">5</dd></div>
+                </dl>
+
+                <div class="history-block">
+                  <p class="panel-label">執行歷程</p>
+                  <ol id="history-list" class="history-list">
+                    <li class="history-empty">還沒有執行紀錄。</li>
+                  </ol>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="principle" aria-labelledby="principle-title">
+        <div class="container">
+          <div class="section-heading">
+            <span class="section-marker" aria-hidden="true"></span>
+            <div>
+              <h2 id="principle-title">排序原理</h2>
+              <p>Heap Sort 分成「建立最大堆積」與「重複取出最大值」兩個階段。</p>
+            </div>
+          </div>
+
+          <div class="principle-grid">
+            <div class="principle-copy prose">
+              <h3>為什麼最大值永遠在第 0 格？</h3>
+              <p>
+                Max-Heap 是一棵完全二元樹，而且每一個父節點都大於或等於自己的子節點。因此根節點一定是整個堆積區的最大值；使用陣列儲存時，根就是索引 0。
+              </p>
+              <div class="formula-block" aria-label="堆積陣列索引公式">
+                <p><span>父節點</span><code>i</code></p>
+                <p><span>左子節點</span><code>2i + 1</code></p>
+                <p><span>右子節點</span><code>2i + 2</code></p>
+              </div>
+              <h3>兩個階段</h3>
+              <ol class="numbered-steps">
+                <li>
+                  <b>建立 Max-Heap</b>
+                  <span>從 <code>floor(n / 2) - 1</code> 開始往前做 siftDown，讓最大值移到堆頂。</span>
+                </li>
+                <li>
+                  <b>連續取出最大值</b>
+                  <span>把索引 0 與堆積區最後一格交換，縮小 <code>heapSize</code>，再從根節點向下調整。</span>
+                </li>
+              </ol>
+            </div>
+
+            <div class="code-frame" aria-labelledby="code-title">
+              <div class="code-titlebar">
+                <span id="code-title">JavaScript 核心程式</span>
+                <span>heapSort.js</span>
+              </div>
+              <pre><code><span class="code-keyword">function</span> heapSort(array) {
+  <span class="code-keyword">const</span> n = array.length;
+
+  <span class="code-comment">// 1. 由下往上建立最大堆積</span>
+  <span class="code-keyword">for</span> (<span class="code-keyword">let</span> i = Math.floor(n / 2) - 1; i &gt;= 0; i--) {
+    siftDown(array, i, n);
+  }
+
+  <span class="code-comment">// 2. 把每輪最大值放到已排序區</span>
+  <span class="code-keyword">for</span> (<span class="code-keyword">let</span> end = n - 1; end &gt; 0; end--) {
+    [array[0], array[end]] = [array[end], array[0]];
+    siftDown(array, 0, end);
+  }
+
+  <span class="code-keyword">return</span> array;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section complexity-section" id="complexity" aria-labelledby="complexity-title">
+        <div class="container">
+          <div class="section-heading">
+            <span class="section-marker" aria-hidden="true"></span>
+            <div>
+              <h2 id="complexity-title">複雜度比較</h2>
+              <p>Heap Sort 的優勢會在資料量增加時愈來愈明顯。</p>
+            </div>
+          </div>
+
+          <div class="complexity-grid">
+            <div class="table-scroll">
+              <table>
+                <caption>Heap Sort 與 Bubble Sort 比較</caption>
+                <thead>
+                  <tr><th scope="col">項目</th><th scope="col">Heap Sort</th><th scope="col">Bubble Sort</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">最佳時間</th><td class="good">O(n log n)</td><td>O(n)<small>需有提前終止最佳化</small></td></tr>
+                  <tr><th scope="row">平均時間</th><td class="good">O(n log n)</td><td class="warn">O(n²)</td></tr>
+                  <tr><th scope="row">最差時間</th><td class="good">O(n log n)</td><td class="warn">O(n²)</td></tr>
+                  <tr><th scope="row">額外空間</th><td>O(1)</td><td>O(1)</td></tr>
+                  <tr><th scope="row">穩定性</th><td>不穩定</td><td>穩定</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <figure class="growth-chart">
+              <figcaption>成長趨勢比較 <span>（約略操作次數，只表示成長速度）</span></figcaption>
+              <svg viewBox="0 0 560 340" role="img" aria-labelledby="chart-title chart-desc">
+                <title id="chart-title">n log n 與 n 平方的成長趨勢</title>
+                <desc id="chart-desc">當 n 從 10 增加到 1000，Bubble Sort 的 n 平方成長遠快於 Heap Sort 的 n log n。</desc>
+                <g class="chart-grid">
+                  <path d="M70 34V282H520" />
+                  <path d="M70 220H520M70 158H520M70 96H520M70 34H520" />
+                </g>
+                <g class="chart-labels">
+                  <text x="58" y="286">0</text><text x="38" y="224">25萬</text><text x="38" y="162">50萬</text><text x="38" y="100">75萬</text><text x="30" y="38">100萬</text>
+                  <text x="126" y="314">n = 10</text><text x="280" y="314">n = 100</text><text x="430" y="314">n = 1,000</text>
+                </g>
+                <polyline class="bubble-line" points="146,282 300,279.5 454,34" />
+                <polyline class="heap-line" points="146,281.99 300,281.84 454,279.53" />
+                <g class="bubble-points"><circle cx="146" cy="282" r="6"/><circle cx="300" cy="279.5" r="6"/><circle cx="454" cy="34" r="6"/></g>
+                <g class="heap-points"><circle cx="146" cy="281.99" r="6"/><circle cx="300" cy="281.84" r="6"/><circle cx="454" cy="279.53" r="6"/></g>
+                <g class="chart-values bubble-values"><text x="132" y="266">100</text><text x="280" y="260">10,000</text><text x="427" y="22">1,000,000</text></g>
+                <g class="chart-values heap-values"><text x="126" y="338">≈ 33</text><text x="276" y="338">≈ 664</text><text x="420" y="338">≈ 9,966</text></g>
+              </svg>
+              <div class="chart-legend"><span><i class="bubble-key"></i>Bubble Sort O(n²)</span><span><i class="heap-key"></i>Heap Sort O(n log n)</span></div>
+            </figure>
+          </div>
+
+          <p class="complexity-note">
+            Bubble Sort 必須反覆比較相鄰元素，平均與最差情況約做 n² 次工作；Heap Sort 每輪下沉最多走樹高 log n，而且只做 n 輪，所以不論原始資料順序，時間複雜度都維持 O(n log n)。
+          </p>
+        </div>
+      </section>
+
+      <section class="section reflection-section" id="reflection" aria-labelledby="reflection-title">
+        <div class="container reflection-shell">
+          <div class="section-heading">
+            <span class="section-marker" aria-hidden="true"></span>
+            <div>
+              <h2 id="reflection-title">學習心得</h2>
+              <p>從看懂 Max-Heap，到真正把每一次比較與交換做成可以操作的網站。</p>
+            </div>
+          </div>
+
+          <div class="reflection-copy prose">
+            <p>
+              一開始學 Heap Sort 時，我只記得「先建立最大堆積，再一直取出最大值」這句話，但沒有真正理解為什麼它能完成排序。實作互動網站後，我才看清楚 Max-Heap 的價值：因為每個父節點都不小於子節點，所以目前最大值永遠在索引 0。每一輪不必重新掃描整個陣列找最大值，只要讀取堆頂就能立刻找到它。
+            </p>
+            <p>
+              我也更清楚建堆與正式排序是兩個不同階段。建堆從最後一個有孩子的節點 <code>floor(n / 2) - 1</code> 開始，逐步向前做 siftDown；完成後的陣列雖然還不是遞增順序，卻已經符合 Max-Heap。正式排序才會把根節點和堆積區最後一格交換，讓最大值進入最右側的已排序區。
+            </p>
+            <p>
+              實作過程中最容易出錯的是 <code>heapSize</code>。每取出一個最大值，heapSize 就必須縮小一格，而且後續 siftDown 絕對不能碰到右側已排序區。只要邊界多算或少算一格，剛排好的最大值就可能被換回去。把堆積區與已排序區畫成不同顏色後，我比較容易檢查這個問題，也真正理解「原地排序」如何在同一個陣列中完成。
+            </p>
+            <p>
+              二元樹與陣列的對應也從抽象公式變得具體。父節點在 i 時，左孩子是 2i + 1，右孩子是 2i + 2。網站同時顯示樹和陣列，讓我看到樹上的一次交換，其實只是陣列中兩個索引的值互換；資料並沒有另外複製成一棵樹。這讓我對完全二元樹的儲存方式更有把握。
+            </p>
+            <p>
+              最後，和 Bubble Sort 比較後，我對時間複雜度的差異有更直觀的感受。資料量小時，兩者看起來都很快；但 n 增加後，O(n log n) 與 O(n²) 的成長差距會迅速拉開。我也用已排序、反向、重複值、負數、零與只有兩個元素等特殊資料測試，確認每一輪取出的確實是當時堆積區的最大值，而不是只對單一範例剛好成功。
+            </p>
+            <p>
+              這次作品不只讓我背會 Heap Sort 的步驟，也讓我練習把演算法拆成可驗證的狀態：建堆、比較、交換、縮小堆積區、完成。之後遇到其他資料結構或排序問題時，我會先釐清資料的表示方式、每一步必須維持的條件，以及哪些特殊輸入最容易讓程式出錯。
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container footer-shell">
+        <span class="brand">Heap Sort Lab</span>
+        <span>資料結構與演算法｜堆積排序互動實驗</span>
+        <a href="#top">回到頂部</a>
+      </div>
+    </footer>
+  </body>
+</html>
