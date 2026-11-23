@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 
 const requiredIds = [
   "data-input",
@@ -62,4 +62,11 @@ test("the reflection records concrete implementation lessons instead of generic 
   assert.match(html, /2i \+ 1/);
   assert.match(html, /Bubble Sort/);
   assert.match(html, /特殊資料/);
+});
+
+test("the document declares a real favicon so browsers do not request a missing default", async () => {
+  const html = await loadPage();
+
+  assert.match(html, /<link[^>]+rel=["']icon["'][^>]+href=["']favicon\.svg["']/);
+  await access(new URL("../favicon.svg", import.meta.url));
 });
