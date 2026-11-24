@@ -5,6 +5,7 @@ import {
   createArrayModel,
   createHistoryEntries,
   createTreeModel,
+  getVisualizationMetrics,
   phaseLabel,
 } from "../src/view-model.js";
 
@@ -76,4 +77,38 @@ test("phaseLabel presents every playback stage in Traditional Chinese", () => {
   assert.equal(phaseLabel("build-complete"), "最大堆積完成");
   assert.equal(phaseLabel("extract"), "取出最大值");
   assert.equal(phaseLabel("complete"), "排序完成");
+});
+
+test("visualization metrics expand for twelve long safe integers without shrinking labels", () => {
+  const values = [
+    9007199254740991,
+    -9007199254740991,
+    123456789012345,
+    -234567890123456,
+    345678901234567,
+    -456789012345678,
+    567890123456789,
+    -678901234567890,
+    789012345678901,
+    -890123456789012,
+    901234567890123,
+    -123456789012345,
+  ];
+  const metrics = getVisualizationMetrics(values);
+
+  assert.equal(metrics.maxDigits, 17);
+  assert.ok(metrics.arrayCellWidth >= 194);
+  assert.ok(metrics.nodeRadius >= 99);
+  assert.ok(metrics.treeWidth > 1600);
+  assert.ok(metrics.treeHeight > 700);
+});
+
+test("visualization metrics preserve the compact classroom layout for short values", () => {
+  assert.deepEqual(getVisualizationMetrics([4, 10, 3, 5, 1]), {
+    maxDigits: 2,
+    arrayCellWidth: 58,
+    nodeRadius: 23,
+    treeWidth: 680,
+    treeHeight: 310,
+  });
 });

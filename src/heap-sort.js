@@ -13,6 +13,12 @@ export function parseIntegerList(text) {
   }
 
   const values = tokens.map(Number);
+  if (values.some((value) => !Number.isSafeInteger(value))) {
+    return {
+      ok: false,
+      error: "整數必須介於 -9007199254740991 與 9007199254740991 之間。",
+    };
+  }
   if (values.length < 2) {
     return { ok: false, error: "請至少輸入 2 個整數。" };
   }

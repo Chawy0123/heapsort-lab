@@ -8,7 +8,7 @@ GitHub Pages 網址：<https://chawy0123.github.io/heapsort-lab/>
 
 ## 主要功能
 
-- 輸入 2–12 個整數，支援負數、零與重複值。
+- 輸入 2–12 個 JavaScript 安全整數（±9,007,199,254,740,991），支援負數、零與重複值。
 - 同步顯示陣列與完全二元樹。
 - 用不同顏色標示堆積區、比較中、交換中及已排序區。
 - 支援建立最大堆積、上一步、下一步、自動排序、暫停與重設。
@@ -54,7 +54,7 @@ python -m http.server 4173 --bind 127.0.0.1
 node --test
 ```
 
-測試涵蓋輸入解析、一般排序、已排序、反向、重複值、負數與零、兩元素、每輪最大值、Max-Heap 合法性、不可變快照、播放控制器及頁面必要內容。
+測試涵蓋輸入解析與安全整數邊界、一般排序、已排序、反向、重複值、負數與零、兩元素、每輪最大值、Max-Heap 合法性、不可變快照、播放控制器、鍵盤快捷鍵、長數字視覺尺寸及頁面必要內容。
 
 ## 專案結構
 
@@ -64,6 +64,7 @@ styles.css                  視覺設計與響應式版面
 favicon.svg                 網站圖示
 src/heap-sort.js            Heap Sort 步驟產生器與輸入驗證
 src/playback-controller.js  上一步、下一步與自動播放控制
+src/keyboard-shortcuts.js   不干擾表單與頁面捲動的鍵盤快捷鍵判斷
 src/view-model.js            陣列、樹與歷程的顯示模型
 src/app.js                  DOM、SVG 與使用者互動
 tests/                      Node.js 自動化測試

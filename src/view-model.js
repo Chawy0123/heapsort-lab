@@ -14,6 +14,18 @@ export function phaseLabel(phase) {
   return PHASE_LABELS[phase] ?? "排序進行中";
 }
 
+export function getVisualizationMetrics(values) {
+  const maxDigits = Math.max(...values.map((value) => String(value).length));
+  const arrayCellWidth = Math.max(58, maxDigits * 10 + 24);
+  const nodeRadius = maxDigits <= 2 ? 23 : maxDigits * 5 + 14;
+  const maxDepth = Math.max(0, Math.floor(Math.log2(values.length)));
+  const leafSlots = 2 ** maxDepth;
+  const treeWidth = Math.max(680, leafSlots * (nodeRadius * 2 + 28));
+  const treeHeight = Math.max(310, 84 + maxDepth * (nodeRadius * 2 + 50));
+
+  return { maxDigits, arrayCellWidth, nodeRadius, treeWidth, treeHeight };
+}
+
 function stateForIndex(step, index) {
   if (index >= step.heapSize) return "sorted";
   if (step.swapIndices.includes(index)) return "swap";

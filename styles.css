@@ -439,9 +439,15 @@ a:focus-visible {
 }
 
 .heap-tree {
-  width: 100%;
-  min-height: 290px;
+  width: 680px;
+  height: 310px;
   margin-block: 4px 8px;
+}
+
+.tree-scroll {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-color: var(--line) transparent;
 }
 
 .tree-edge {
@@ -555,8 +561,8 @@ a:focus-visible {
 }
 
 .array-cell {
-  width: 58px;
-  flex: 0 0 58px;
+  width: var(--cell-width, 58px);
+  flex: 0 0 var(--cell-width, 58px);
   display: grid;
   gap: 5px;
   justify-items: center;
@@ -569,7 +575,7 @@ a:focus-visible {
 }
 
 .array-cell .value {
-  width: 58px;
+  width: var(--cell-width, 58px);
   height: 50px;
   border: 1px solid var(--cyan-deep);
   border-radius: 7px;

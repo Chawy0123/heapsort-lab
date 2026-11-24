@@ -68,7 +68,7 @@
                 </svg>
                 重設
               </button>
-              <p class="input-help" id="input-help">可輸入 2–12 個整數，支援負數與重複值。</p>
+              <p class="input-help" id="input-help">可輸入 2–12 個安全整數（±9,007,199,254,740,991），支援負數與重複值。</p>
               <p class="input-error" id="input-error" role="alert" aria-live="polite"></p>
             </form>
 
@@ -99,13 +99,15 @@
                   <h3>最大堆積視圖</h3>
                   <span class="heap-status" id="heap-status">等待建堆</span>
                 </div>
-                <svg
-                  id="heap-tree"
-                  class="heap-tree"
-                  viewBox="0 0 680 330"
-                  role="img"
-                  aria-label="最大堆積二元樹"
-                ></svg>
+                <div class="tree-scroll" tabindex="0" aria-label="堆積樹，可水平捲動">
+                  <svg
+                    id="heap-tree"
+                    class="heap-tree"
+                    viewBox="0 0 680 330"
+                    role="img"
+                    aria-label="最大堆積二元樹"
+                  ></svg>
+                </div>
 
                 <div class="array-heading">
                   <h3>陣列 <span>heap｜sorted</span></h3>

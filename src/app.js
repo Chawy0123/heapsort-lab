@@ -4,10 +4,12 @@ import {
   parseIntegerList,
 } from "./heap-sort.js";
 import { createPlaybackController } from "./playback-controller.js";
+import { shouldHandleVisualizerShortcut } from "./keyboard-shortcuts.js";
 import {
   createArrayModel,
   createHistoryEntries,
   createTreeModel,
+  getVisualizationMetrics,
   phaseLabel,
 } from "./view-model.js";
 
@@ -59,7 +61,9 @@ function svgElement(name, attributes = {}) {
 
 function renderArray(step) {
   const model = createArrayModel(step);
+  const metrics = getVisualizationMetrics(step.array);
   const fragment = document.createDocumentFragment();
+  elements.array.style.setProperty("--cell-width", `${metrics.arrayCellWidth}px`);
 
   for (const cell of model.cells) {
     if (cell.index === model.boundaryIndex && model.boundaryIndex > 0) {
@@ -89,11 +93,14 @@ function renderArray(step) {
 }
 
 function renderTree(step) {
-  const width = 680;
-  const height = step.array.length > 7 ? 350 : 310;
+  const metrics = getVisualizationMetrics(step.array);
+  const width = metrics.treeWidth;
+  const height = metrics.treeHeight;
   const model = createTreeModel(step, width, height);
   const fragment = document.createDocumentFragment();
   elements.tree.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  elements.tree.style.width = `${width}px`;
+  elements.tree.style.height = `${height}px`;
 
   for (const edge of model.edges) {
     const parent = model.nodes[edge.parentIndex];
@@ -116,7 +123,11 @@ function renderTree(step) {
       role: "img",
       "aria-label": `索引 ${node.index}，值 ${node.value}，${node.state}`,
     });
-    const circle = svgElement("circle", { cx: 0, cy: 0, r: 23 });
+    const circle = svgElement("circle", {
+      cx: 0,
+      cy: 0,
+      r: metrics.nodeRadius,
+    });
     const value = svgElement("text", {
       x: 0,
       y: 6,
@@ -126,7 +137,7 @@ function renderTree(step) {
     value.textContent = String(node.value);
     const index = svgElement("text", {
       x: 0,
-      y: 39,
+      y: metrics.nodeRadius + 16,
       "text-anchor": "middle",
       class: "node-index",
     });
@@ -136,6 +147,10 @@ function renderTree(step) {
   }
 
   elements.tree.replaceChildren(fragment);
+  if (step.phase === "initial") {
+    const scroller = elements.tree.parentElement;
+    scroller.scrollLeft = Math.max(0, (scroller.scrollWidth - scroller.clientWidth) / 2);
+  }
 }
 
 function renderHistory(index) {
@@ -273,7 +288,14 @@ elements.autoPlay.addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+  const target = event.target;
+  const insideVisualizer = target instanceof Node && $("visualizer").contains(target);
+  if (!shouldHandleVisualizerShortcut({
+    key: event.key,
+    tagName: target?.tagName ?? "",
+    isContentEditable: Boolean(target?.isContentEditable),
+    insideVisualizer,
+  })) return;
   if (event.key === "ArrowRight") {
     event.preventDefault();
     stopAutoPlay();

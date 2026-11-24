@@ -42,6 +42,33 @@ test("parseIntegerList rejects more than twelve integers", () => {
   });
 });
 
+test("parseIntegerList preserves the exact safe-integer boundaries", () => {
+  assert.deepEqual(
+    parseIntegerList("9007199254740991, -9007199254740991"),
+    {
+      ok: true,
+      values: [9007199254740991, -9007199254740991],
+    },
+  );
+});
+
+test("parseIntegerList rejects integers that JavaScript cannot represent exactly", () => {
+  assert.deepEqual(
+    parseIntegerList("9007199254740993, 9007199254740992"),
+    {
+      ok: false,
+      error: "整數必須介於 -9007199254740991 與 9007199254740991 之間。",
+    },
+  );
+  assert.deepEqual(
+    parseIntegerList(`${"9".repeat(310)}, 1`),
+    {
+      ok: false,
+      error: "整數必須介於 -9007199254740991 與 9007199254740991 之間。",
+    },
+  );
+});
+
 const sortingCases = [
   { name: "一般亂序", input: [4, 10, 3, 5, 1], expected: [1, 3, 4, 5, 10] },
   { name: "已經排好", input: [1, 2, 3, 4, 5], expected: [1, 2, 3, 4, 5] },
